@@ -1,4 +1,4 @@
-# vision-to-language-captioning
+# Vision-to-Language-Captioning
 This project implements an end-to-end image captioning system using PyTorch, combining computer vision and natural language processing to automatically generate natural-language descriptions for images. The model architecture integrates a pre-trained Convolutional Neural Network (CNN) as an encoder to extract meaningful visual features from input images and a custom Recurrent Neural Network (RNN), specifically an LSTM-based decoder, to generate captions.
 
 The encoder uses a model like ResNet or EfficientNet (with the classification head removed) to output a feature vector representing the high-level content of each image. This vector is then fed into the decoder, which is trained to produce a sequence of words that form a coherent and contextually accurate caption. The decoder incorporates techniques such as embedding layers, teacher forcing, and optionally attention mechanisms to improve caption quality.
