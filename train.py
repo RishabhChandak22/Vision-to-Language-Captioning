@@ -39,17 +39,19 @@ for epoch in range(NUM_EPOCHS):
     for idx, (images, captions) in enumerate(train_loader):
         images = images.to(DEVICE)
         captions = captions.to(DEVICE)
-
         features = encoder(images)
         outputs = decoder(features, captions)
-
         loss = criterion(outputs.view(-1, len(vocab)), captions[:, 1:].reshape(-1))
-
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
         if idx % 1 == 0:
             print(f"Epoch [{epoch+1}/{NUM_EPOCHS}], Step [{idx+1}/{len(train_loader)}], Loss: {loss.item():.4f}")
 
-print("Training complete.")
+torch.save({
+    'encoder': encoder.state_dict(),
+    'decoder': decoder.state_dict(),
+    'optimizer': optimizer.state_dict()
+}, 'caption_model.pth')
+
+print("Training complete and model saved to caption_model.pth.")
