@@ -1,52 +1,55 @@
-# train.py
-
+import os
 import torch
-from torch import nn, optim
-from torch.utils.data import DataLoader
-from dataset import CaptionDataset
+import torch.nn as nn
+import torch.optim as optim
+from torchvision import transforms
+from dataset import get_loader
+from vocab import DummyVocab
 from model import EncoderCNN, DecoderRNN
-from utils import save_model, get_loader, vocab
+from PIL import Image
 
-# Hyperparameters
-EPOCHS = 5
-BATCH_SIZE = 32
-LEARNING_RATE = 3e-4
 EMBED_SIZE = 256
 HIDDEN_SIZE = 512
 NUM_LAYERS = 1
+BATCH_SIZE = 2
+NUM_EPOCHS = 3
+LEARNING_RATE = 3e-4
 
-def train():
-    # 1. Load data
-    train_loader, vocab_size = get_loader(batch_size=BATCH_SIZE)
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # 2. Initialize model
-    encoder = EncoderCNN(EMBED_SIZE).to(device)
-    decoder = DecoderRNN(EMBED_SIZE, HIDDEN_SIZE, vocab_size, NUM_LAYERS).to(device)
+image_paths = [f"test_images/img{i}.jpg" for i in range(2)]
+captions = [['a', 'man', 'riding', 'bike'], ['a', 'man', 'on', 'street']]
+vocab = DummyVocab()
 
-    # 3. Loss and optimizer
-    criterion = nn.CrossEntropyLoss(ignore_index=vocab.pad_idx)
-    params = list(decoder.parameters()) + list(encoder.linear.parameters()) + list(encoder.bn.parameters())
-    optimizer = optim.Adam(params, lr=LEARNING_RATE)
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+])
 
-    # 4. Training loop
-    for epoch in range(EPOCHS):
-        for i, (images, captions) in enumerate(train_loader):
-            images, captions = images.to(device), captions.to(device)
-            
-            features = encoder(images)
-            outputs = decoder(features, captions)
+train_loader = get_loader(image_paths, captions, vocab, transform, batch_size=BATCH_SIZE)
 
-            loss = criterion(outputs.view(-1, vocab_size), captions.view(-1))
-            
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+encoder = EncoderCNN(EMBED_SIZE).to(DEVICE)
+decoder = DecoderRNN(EMBED_SIZE, HIDDEN_SIZE, len(vocab), NUM_LAYERS).to(DEVICE)
 
-            if i % 100 == 0:
-                print(f"Epoch [{epoch+1}/{EPOCHS}], Step [{i}/{len(train_loader)}], Loss: {loss.item():.4f}")
+criterion = nn.CrossEntropyLoss(ignore_index=vocab.pad_idx)
+params = list(decoder.parameters()) + list(encoder.linear.parameters()) + list(encoder.bn.parameters())
+optimizer = optim.Adam(params, lr=LEARNING_RATE)
 
-        save_model(encoder, decoder, epoch)
+for epoch in range(NUM_EPOCHS):
+    for idx, (images, captions) in enumerate(train_loader):
+        images = images.to(DEVICE)
+        captions = captions.to(DEVICE)
 
-if __name__ == "__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    train()
+        features = encoder(images)
+        outputs = decoder(features, captions)
+
+        loss = criterion(outputs.view(-1, len(vocab)), captions[:, 1:].reshape(-1))
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if idx % 1 == 0:
+            print(f"Epoch [{epoch+1}/{NUM_EPOCHS}], Step [{idx+1}/{len(train_loader)}], Loss: {loss.item():.4f}")
+
+print("Training complete.")
