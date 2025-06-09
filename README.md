@@ -1,8 +1,40 @@
-# Vision-to-Language-Captioning
-This project implements an end-to-end image captioning system using PyTorch, combining computer vision and natural language processing to automatically generate natural-language descriptions for images. The model architecture integrates a pre-trained Convolutional Neural Network (CNN) as an encoder to extract meaningful visual features from input images and a custom Recurrent Neural Network (RNN), specifically an LSTM-based decoder, to generate captions.
+# 🖼️ Image Captioning with CNN-RNN (Vision to Language)
 
-The encoder uses a model like ResNet or EfficientNet (with the classification head removed) to output a feature vector representing the high-level content of each image. This vector is then fed into the decoder, which is trained to produce a sequence of words that form a coherent and contextually accurate caption. The decoder incorporates techniques such as embedding layers, teacher forcing, and optionally attention mechanisms to improve caption quality.
+This project implements an end-to-end deep learning model that generates natural language captions for images. A convolutional neural network (CNN) encodes image features, and a recurrent neural network (RNN) decodes them into grammatically correct captions.
 
-Training is conducted on the MS-COCO dataset, which provides a rich collection of images annotated with multiple human-generated captions. The pipeline includes essential preprocessing steps such as tokenization, vocabulary construction, and sequence padding. Evaluation is performed using standard NLP metrics like BLEU scores to assess the quality of generated captions relative to ground truth annotations.
+## 🚀 Objective
+To train a model that can generate accurate and descriptive captions for input images by combining computer vision and natural language processing.
 
-This project demonstrates the integration of visual and linguistic modalities, showcasing practical skills in deep learning, CNN-RNN architectures, sequence modeling, and PyTorch framework usage. It serves as a foundational application for more advanced vision-language models and can be extended to include attention mechanisms, transformer decoders, or custom datasets.
+## 📦 Architecture
+- **CNN Encoder**: Pretrained ResNet extracts image feature vectors
+- **RNN Decoder**: An LSTM generates word sequences conditioned on the encoded features
+- **Dataset**: Trained on MSCOCO or Flickr8k image-caption pairs
+
+## 🛠️ Features
+- Transfer learning with pretrained CNNs
+- Tokenized and padded text data handling
+- Custom PyTorch `Dataset` and `DataLoader` classes
+- Caption generation with greedy decoding
+- Optional BLEU score evaluation
+
+## 🧪 Files
+- `train.py` – training loop for the captioning model
+- `model.py` – encoder and decoder definitions
+- `dataset.py` – dataset preprocessing and loading
+- `utils.py` – helper functions for vocabulary, image transforms, etc.
+- `inference.py` – generate captions for test images
+
+## ✅ To-Do
+- [ ] Load and preprocess dataset
+- [ ] Build vocabulary and tokenizers
+- [ ] Train encoder-decoder model
+- [ ] Evaluate using BLEU scores
+- [ ] Inference + visualization
+
+## 📸 Example Output
+> 🖼️ [Image of dog on surfboard]  
+> 📝 "A dog riding a wave on a surfboard."
+
+---
+
+Let me know if you want Docker setup, Colab support, or deployment steps added!
