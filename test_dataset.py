@@ -23,6 +23,7 @@ transform = transforms.Compose([
 ])
 
 loader = get_loader(image_paths, captions, vocab, transform, batch_size=2)
+print("Loader initialized!")
 
 for images, caps in loader:
     print("✅ Images shape:", images.shape)
