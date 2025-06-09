@@ -1,5 +1,5 @@
 
-
+import torch
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 import torchvision.transforms as transforms
@@ -30,5 +30,11 @@ class CaptionDataset(Dataset):
 
 def get_loader(image_paths, captions, vocab, transform, batch_size):
     dataset = CaptionDataset(image_paths, captions, vocab, transform)
-    data_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, num_workers=2, pin_memory=True)
+    data_loader = DataLoader(
+        dataset=dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=0,  
+        pin_memory=True
+    )
     return data_loader
